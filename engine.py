@@ -85,3 +85,38 @@ def generate_heatmap_grid(center_lat: float, center_lon: float, grid_size: int =
         "city_center": [center_lon, center_lat],
         "features": features
     }
+    
+
+
+def get_city_stats(lat: float, lon: float):
+    """
+    Calculates aggregate stats for the Dashboard Sidebar.
+    """
+    # 1. Reuse the grid generator to get raw data
+    # We use a 5x5 grid for a quick statistical sample
+    grid_data = generate_heatmap_grid(lat, lon, grid_size=5)
+    
+    features = grid_data['features']
+    total_points = len(features)
+    
+    if total_points == 0:
+        return {"avg_temp": 0, "green_cover": 0}
+
+    # 2. Calculate Averages
+    total_temp = sum([f['properties']['temp'] for f in features])
+    total_ndvi = sum([f['properties']['ndvi'] for f in features])
+    
+    avg_temp = total_temp / total_points
+    avg_ndvi = total_ndvi / total_points
+    
+    # 3. Return clean stats for the UI
+    return {
+        "city_center": {"lat": lat, "lon": lon},
+        "stats": {
+            "avg_temp_celsius": round(avg_temp, 1),
+            "avg_ndvi_index": round(avg_ndvi, 3),
+            # Logic: If NDVI > 0.3, we consider it "Green Cover"
+            "green_cover_percent": f"{int(avg_ndvi * 100)}%",
+            "risk_level": "High" if avg_temp > 35 else "Moderate"
+        }
+    }

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from engine import generate_heatmap_grid
+from engine import generate_heatmap_grid, get_city_stats
 
 app = FastAPI()
 
@@ -16,6 +16,18 @@ def analyze_area(lat: float, lon: float):
     try:
         # We start with a small 3x3 grid (9 points) for speed testing
         data = generate_heatmap_grid(lat, lon, grid_size=10)
+        return {"status": "success", "data": data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/stats")
+def get_stats(lat: float, lon: float):
+    """
+    URL: /stats?lat=28.61&lon=77.20
+    Returns summary for the sidebar charts.
+    """
+    try:
+        data = get_city_stats(lat, lon)
         return {"status": "success", "data": data}
     except Exception as e:
         return {"status": "error", "message": str(e)}
