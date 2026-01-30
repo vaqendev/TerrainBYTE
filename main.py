@@ -14,7 +14,7 @@ def analyze_area(lat: float, lon: float):
     scans a 3x3 grid around the coordinate.
     """
     try:
-        # We start with a small 3x3 grid (9 points) for speed testing
+        # We start with a small 10x10 grid (100 points) for speed testing
         data = generate_heatmap_grid(lat, lon, grid_size=10)
         return {"status": "success", "data": data}
     except Exception as e:
